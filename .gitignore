@@ -1,2 +1,6 @@
 # IDEs
 .idea/
+
+# Caches
+Client/__pycache__/
+Server/__pycache__/
