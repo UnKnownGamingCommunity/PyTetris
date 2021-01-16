@@ -1,7 +1,8 @@
 #===========[ Game-Setting - Begin ]======================
-fps = 60                # set the framerate of the game
-zoom = 20               # set the size of the output
-multiColorBlock = True  # enable multiple colors (blocks - also known as tetriminos - only)
+fps = 60                     # set the framerate of the game
+zoom = 20                    # set the size of the output
+multiColorBlock = True       # enable multiple colors (blocks - also known as tetriminos - only)
+updatePressingKey = fps / 20 # update the pressed keys per second
 #===========[ Game-Setting - End ]========================
 
 #===========[ Colors - Begin ]============================

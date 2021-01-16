@@ -51,8 +51,6 @@ class Tetris:
     pressingLeft = False
     pressingLeftCounter = 0
     pressingLeftFirstUpdate = 0
-    # update the pressed keys per second
-    updatePressingKey = configs.fps / 10
 
     # set the default values for this game
     def __init__(self, _width, _height, posX, posY):
@@ -72,7 +70,6 @@ class Tetris:
         self.pressingLeft = False
         self.pressingLeftCounter = 0
         self.pressingLeftFirstUpdate = 0
-        self.updatePressingKey = configs.fps / 10
 
         # create the field lines and values
         for i in range(_height):
@@ -191,44 +188,35 @@ class Tetris:
         return False
 
     # update the game by the input
-    def updateInput(self):
-        backToMenu = False
-        exitGame = False
-        for event in pygame.event.get():
-            # exit application
-            if event.type == pygame.QUIT:
-                exitGame = True
-
-            # set the pressed keys and update key-events
-            elif event.type == pygame.KEYDOWN:
-                if self.state != "gameover":
-                    if event.key == pygame.K_UP:
-                        self.rotateRight()
-                    if event.key == pygame.K_DOWN:
-                        self.rotateLeft()
-                    if event.key == pygame.K_RIGHT:
-                        self.pressingRight = True
-                        self.pressingRightCounter = 1
-                        self.pressingRightFirstUpdate = 0
-                        self.moveRight()
-                    if event.key == pygame.K_LEFT:
-                        self.pressingLeft = True
-                        self.pressingLeftCounter = 1
-                        self.pressingLeftFirstUpdate = 0
-                        self.moveLeft()
-                    if event.key == pygame.K_SPACE:
-                        self.drop()
-                elif event.key == pygame.K_ESCAPE:
-                    backToMenu = True
+    def updateInput(self, event):
+        if self.state == "running":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    self.rotateRight()
+                if event.key == pygame.K_DOWN:
+                    self.rotateLeft()
+                if event.key == pygame.K_RIGHT:
+                    self.pressingRight = True
+                    self.pressingRightCounter = 1
+                    self.pressingRightFirstUpdate = 0
+                    self.moveRight()
+                if event.key == pygame.K_LEFT:
+                    self.pressingLeft = True
+                    self.pressingLeftCounter = 1
+                    self.pressingLeftFirstUpdate = 0
+                    self.moveLeft()
+                if event.key == pygame.K_SPACE:
+                    self.drop()
 
             # reset the pressed keys
-            elif event.type == pygame.KEYUP and self.state != "gameover":
+            elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
                     self.pressingRight = False
                 if event.key == pygame.K_LEFT:
                     self.pressingLeft = False
 
-        # update pressed keys
+    # update pressed keys
+    def updatePressedImput(self):
         if self.state != "gameover":
             if self.pressingLeft and self.pressingLeftCounter == 0:
                 self.moveLeft()
@@ -239,12 +227,10 @@ class Tetris:
 
             self.pressingLeftFirstUpdate += 1
             self.pressingRightFirstUpdate += 1
-            if self.pressingLeftFirstUpdate > self.updatePressingKey * 5:
-                self.pressingLeftCounter = (self.pressingLeftCounter + 1) % (self.updatePressingKey + 1)
-            if self.pressingRightFirstUpdate > self.updatePressingKey * 5:
-                self.pressingRightCounter = (self.pressingRightCounter + 1) % (self.updatePressingKey + 1)
-
-        return (backToMenu, exitGame)
+            if self.pressingLeftFirstUpdate > configs.updatePressingKey * 5:
+                self.pressingLeftCounter = (self.pressingLeftCounter + 1) % (configs.updatePressingKey + 1)
+            if self.pressingRightFirstUpdate > configs.updatePressingKey * 5:
+                self.pressingRightCounter = (self.pressingRightCounter + 1) % (configs.updatePressingKey + 1)
 
     def draw(self, screen):
         # draw game field border
@@ -255,7 +241,7 @@ class Tetris:
             for j in range(self.width):
                 border = 0
                 clBlock = configs.clWhite
-                if self.field[i][j] == 0:
+                if self.field[i][j] == 0 or self.state == "paused":
                     border = 1
                     clBlock = configs.clDarkGray
                 elif self.field[i][j] > 0:
@@ -264,7 +250,7 @@ class Tetris:
                 pygame.draw.rect(screen, color=clBlock, rect=[self.fieldPosX + j * configs.zoom, self.fieldPosY + i * configs.zoom, configs.zoom, configs.zoom], width=border)
 
         # draw game current block
-        if self.block is not None:
+        if self.block is not None and self.state != "paused":
             for i in range(4):
                 for j in range(4):
                     position = i * 4 + j

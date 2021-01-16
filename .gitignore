@@ -2,5 +2,5 @@
 .idea/
 
 # Caches
-Client/__pycache__/
-Server/__pycache__/
+client/__pycache__/
+server/__pycache__/
