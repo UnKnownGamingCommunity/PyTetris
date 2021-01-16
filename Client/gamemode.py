@@ -8,7 +8,6 @@ class SinglePlayer:
     backToMenu = False # exit game mode
     screen = None
 
-    # create font and text
     gameover_font = None
     text_gameover = None
 
@@ -17,13 +16,16 @@ class SinglePlayer:
         self.gameInput = self.gameList[0]  # the local game
         self.gameList[0].newBlock()
         self.screen = _screen
+
+        # create font and text
         self.gameover_font = pygame.font.SysFont('DejaVu Sans', int(2.44 * configs.zoom), True, False)
         self.text_gameover = self.gameover_font.render("Game Over!", True, (255, 255, 255))
 
     def run(self, clock):
-        while not self.backToMenu:
+        exitGame = False
+        while not self.backToMenu and not exitGame:
             #=======[ Game-Input - Begin ]========================
-            self.backToMenu = self.gameInput.updateInput()
+            (self.backToMenu, exitGame) = self.gameInput.updateInput()
             #=======[ Game-Input - End ]==========================
 
             #=======[ Draw Game - Begin ]=========================
@@ -46,3 +48,5 @@ class SinglePlayer:
             #=======[ Draw Game - End ]===========================
 
             clock.tick(configs.fps)  # wait time to reach the fps
+
+        return exitGame

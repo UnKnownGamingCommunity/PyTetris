@@ -11,6 +11,10 @@ clWhite = (255, 255, 255)
 clDarkGray = (48, 48, 48)
 clMenuBorder = (255, 255, 255)
 clMenuBackground = (0, 0, 0)
+clMenuTextSelected = (255, 255, 255)
+clMenuTextUnselected = (200, 200, 200)
+clMenuTextDisabled = (128, 128, 128)
+clMenuBackgroundSelected = (60, 60, 60)
 if multiColorBlock:
     clBlockColors = [
         (0, 240, 240),  # I-Block

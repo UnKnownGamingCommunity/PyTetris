@@ -192,14 +192,16 @@ class Tetris:
 
     # update the game by the input
     def updateInput(self):
+        backToMenu = False
+        exitGame = False
         for event in pygame.event.get():
             # exit application
             if event.type == pygame.QUIT:
-                    return True
+                exitGame = True
 
-            elif self.state != "gameover":
-                # set the pressed keys and update key-events
-                if event.type == pygame.KEYDOWN:
+            # set the pressed keys and update key-events
+            elif event.type == pygame.KEYDOWN:
+                if self.state != "gameover":
                     if event.key == pygame.K_UP:
                         self.rotateRight()
                     if event.key == pygame.K_DOWN:
@@ -216,13 +218,15 @@ class Tetris:
                         self.moveLeft()
                     if event.key == pygame.K_SPACE:
                         self.drop()
+                elif event.key == pygame.K_ESCAPE:
+                    backToMenu = True
 
-                # reset the pressed keys
-                if event.type == pygame.KEYUP:
-                    if event.key == pygame.K_RIGHT:
-                        self.pressingRight = False
-                    if event.key == pygame.K_LEFT:
-                        self.pressingLeft = False
+            # reset the pressed keys
+            elif event.type == pygame.KEYUP and self.state != "gameover":
+                if event.key == pygame.K_RIGHT:
+                    self.pressingRight = False
+                if event.key == pygame.K_LEFT:
+                    self.pressingLeft = False
 
         # update pressed keys
         if self.state != "gameover":
@@ -240,7 +244,7 @@ class Tetris:
             if self.pressingRightFirstUpdate > self.updatePressingKey * 5:
                 self.pressingRightCounter = (self.pressingRightCounter + 1) % (self.updatePressingKey + 1)
 
-        return False
+        return (backToMenu, exitGame)
 
     def draw(self, screen):
         # draw game field border
