@@ -66,12 +66,13 @@ class SelectBoxVertical:
     maxCaptionWidth = 0
     maxWidth = 0
     isEdit = False
+    id = ""
 
     caption_font = None
     value_font = None
     text_caption = None
 
-    def __init__(self, _caption, _values, _fontSize, _scale, _maxValueWidth, _enabled, _maxCaptionWidth):
+    def __init__(self, _caption, _values, _fontSize, _scale, _maxValueWidth, _enabled, _maxCaptionWidth, _id):
         # "_values" = [[display name, id] value]
         self.caption = _caption
         self.fontSize = int(_fontSize * configs.zoom * _scale)
@@ -83,6 +84,7 @@ class SelectBoxVertical:
         self.maxCaptionWidth = _maxCaptionWidth * configs.zoom * _scale
         self.maxWidth = self.maxCaptionWidth + self.maxValueWidth
         self.isEdit = False
+        self.id = _id
 
         self.caption_font = pygame.font.SysFont('DejaVu Sans', self.fontSize, True, False)
         self.text_caption = self.caption_font.render(self.caption, True, configs.clMenuTextUnselected)
@@ -145,12 +147,13 @@ class CheckBox:
     value = False
     text_height = 0
     maxWidth = 0
+    id = ""
 
     caption_font = None
     value_font = None
     text_caption = None
 
-    def __init__(self, _caption, _defaultValue, _fontSize, _scale, _maxValueWidth, _enabled, _maxCaptionWidth):
+    def __init__(self, _caption, _defaultValue, _fontSize, _scale, _maxValueWidth, _enabled, _maxCaptionWidth, _id):
         self.fontSize = int(_fontSize * configs.zoom * _scale)
         self.scale = _scale
         self.maxValueWidth = _maxValueWidth * configs.zoom * _scale
@@ -160,6 +163,7 @@ class CheckBox:
         self.defaultValue = _defaultValue
         self.value = _defaultValue
         self.maxWidth = self.maxCaptionWidth + self.maxValueWidth
+        self.id = _id
 
         self.caption_font = pygame.font.SysFont('DejaVu Sans', self.fontSize, True, False)
         self.text_caption = self.caption_font.render(self.caption, True, configs.clMenuTextUnselected)
@@ -228,9 +232,11 @@ class Menu:
         self.scale = _scale
         self.menuItems = _menuItems
         self.selectedArea = 0
-        self.selectedItem = 1
+        self.selectedItem = 0
         self.screen = _screen
         self.enabled = True
+
+        self.newItemSelection(+1)
 
     def newItemSelection(self, delta):
         self.selectedItem = (self.selectedItem - 1 + delta) % (len(self.menuItems[self.selectedArea]) - 1) + 1
@@ -290,7 +296,8 @@ class Menu:
                             self.newItemSelection(1)
                     elif event.key == pygame.K_TAB:
                         self.selectedArea = (self.selectedArea + 1) % len(self.menuItems)
-                        self.selectedItem = 1
+                        self.selectedItem = 0
+                        self.newItemSelection(+1)
                     elif event.key == pygame.K_RETURN and isinstance(self.menuItems[self.selectedArea][self.selectedItem], Button):
                         usedButton = self.menuItems[self.selectedArea][self.selectedItem].buttonID
                     elif event.key == pygame.K_RETURN and isinstance(self.menuItems[self.selectedArea][self.selectedItem], SelectBoxVertical):
@@ -300,10 +307,19 @@ class Menu:
         return usedButton
 
     def reset(self):
-        self.selectedItem = 1
+        self.selectedItem = 0
         self.selectedArea = 0
+        self.newItemSelection(+1)
         for area in range(len(self.menuItems)):
             for item in range(len(self.menuItems[area])):
                 if not isinstance(self.menuItems[self.selectedArea][self.selectedItem], Button):
                     self.menuItems[self.selectedArea][self.selectedItem].reset()
+
+    def getValue(self, _id):
+        for area in range(len(self.menuItems)):
+            for item in range(len(self.menuItems[area])):
+                if not isinstance(self.menuItems[area][item], Button) and  not isinstance(self.menuItems[area][item], bool):
+                    if self.menuItems[area][item].id == _id:
+                        return self.menuItems[area][item].getValue()
+        return None
 #===========[ Menu-Class - End ]==========================

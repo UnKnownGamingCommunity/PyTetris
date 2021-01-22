@@ -4,7 +4,7 @@ import configs
 
 #===========[ Create Window - Begin ]=====================
 pygame.init()
-windowWidth = 18
+windowWidth = 20
 windowHeight = 22
 screen = pygame.display.set_mode((windowWidth * configs.zoom, windowHeight * configs.zoom))
 pygame.display.set_caption("Tetris")
@@ -57,8 +57,8 @@ gameLevel = [
 # "singleplayerMenuItemList" = [[vertical menu, menu items ...] menu areas]
 singleplayerMenuItemList = [[
     True,
-    menu.SelectBoxVertical("Level", gameLevel, 1, singleplayerMenuScale, singleplayerMenuValueWidth, True, singleplayerMenuWidth - singleplayerMenuValueWidth),
-    menu.CheckBox("Items", False, 1, singleplayerMenuScale, singleplayerMenuValueWidth, True, singleplayerMenuWidth - singleplayerMenuValueWidth)
+    menu.CheckBox("Items", False, 1, singleplayerMenuScale, singleplayerMenuValueWidth, False, singleplayerMenuWidth - singleplayerMenuValueWidth, "items"),
+    menu.SelectBoxVertical("Level", gameLevel, 1, singleplayerMenuScale, singleplayerMenuValueWidth, True, singleplayerMenuWidth - singleplayerMenuValueWidth, "level")
 ],
 [
     False,
@@ -107,7 +107,7 @@ while not exitGame:
             pygame.display.flip()  # update screen
 
             if menuItem == "start":
-                myGame = gamemode.SinglePlayer(screen, 1)
+                myGame = gamemode.SinglePlayer(screen, singleplayerMenu.getValue("level"), 0.5, singleplayerMenu.getValue("items"), windowWidth, windowHeight)
                 exitGame = myGame.run(clock, windowWidth, windowHeight)
                 backToMainMenu = True
             elif menuItem == "back":
@@ -116,6 +116,7 @@ while not exitGame:
 
         menuItem = "none"
         singleplayerMenu.reset()
+        mainMenu.reset()
     elif menuItem == "coop":
         pass
     elif menuItem == "coop_2vs2":

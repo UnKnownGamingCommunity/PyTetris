@@ -1,6 +1,6 @@
 #===========[ Game-Setting - Begin ]======================
 fps = 60                     # set the framerate of the game
-zoom = 20                    # set the size of the output
+zoom = 30                    # set the size of the output
 multiColorBlock = True       # enable multiple colors (blocks - also known as tetriminos - only)
 multiColorMenu = True        # enable multiple menu colors
 updatePressingKey = fps / 20 # update the pressed keys per second
@@ -29,8 +29,19 @@ if multiColorBlock:
         (240, 0, 0),    # S-Block
         (255, 255, 255) # unknown Block
     ]
+    clBlockBorderColors = [
+        (0, 200, 200),  # I-Block
+        (0, 0, 200),    # J-Block
+        (210, 100, 0),  # L-Block
+        (220, 185, 0),  # O-Block
+        (0, 200, 0),    # Z-Block
+        (130, 0, 200),  # T-Block
+        (200, 0, 0),    # S-Block
+        (210, 210, 210) # unknown Block
+    ]
 else:
     clActiveBlock = (255, 255, 255) # current block
+    clActiveBlockBorder = (210, 210, 210) # current block
     clBlockColors = [
         (200, 200, 200), # I-Block
         (200, 200, 200), # J-Block
@@ -41,12 +52,22 @@ else:
         (200, 200, 200), # S-Block
         (200, 200, 200)  # unknown Block
     ]
+    clBlockBorderColors = [
+        (160, 160, 160), # I-Block
+        (160, 160, 160), # J-Block
+        (160, 160, 160), # L-Block
+        (160, 160, 160), # O-Block
+        (160, 160, 160), # Z-Block
+        (160, 160, 160), # T-Block
+        (160, 160, 160), # S-Block
+        (160, 160, 160)  # unknown Block
+    ]
 
 if multiColorMenu:
-    clChckeBoxOnSelected = (200, 0, 0)
-    clChckeBoxOffSelected = (0, 200, 0)
-    clChckeBoxOnUnselected = (130, 0, 0)
-    clChckeBoxOffUnselected = (0, 130, 0)
+    clChckeBoxOnSelected = (0, 200, 0)
+    clChckeBoxOffSelected = (200, 0, 0)
+    clChckeBoxOnUnselected = (0, 130, 0)
+    clChckeBoxOffUnselected = (130, 0, 0)
 else:
     clChckeBoxOnSelected = (255, 255, 255)
     clChckeBoxOffSelected = (255, 255, 255)
@@ -73,3 +94,38 @@ allBlocks = [
     [[0, 1, 5, 6], [1, 4, 5, 8]]                              # S-Block
 ]
 #===========[ Block-List - End ]==========================
+
+#===========[ Level Increase - Begin ]====================
+# points to increase the level - point divergent
+levelUp = [
+    300,   # to level 2
+    400,   # to level 3
+    550,   # to level 4
+    750,   # to level 5
+    1000,  # to level 6
+    1300,  # to level 7
+    1650,  # to level 8
+    2050,  # to level 9
+    2500,  # to level 10
+    3000,  # to level 11
+    3550,  # to level 12
+    4150,  # to level 13
+    4800,  # to level 14
+    5500,  # to level 15
+    6250,  # to level 16
+    7050,  # to level 17
+    7900,  # to level 18
+    8800,  # to level 19
+    9750,  # to level 20
+    10750, # to level 21
+    11800, # to level 22
+    12900, # to level 23
+    14050, # to level 24
+    15250, # to level 25
+    17800, # to level 26
+    19150, # to level 27
+    20550, # to level 28
+    22000, # to level 29
+    23500  # to level 30
+]
+#===========[ Level Increase - End ]======================

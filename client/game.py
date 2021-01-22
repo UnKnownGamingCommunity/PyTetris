@@ -42,6 +42,10 @@ class Tetris:
     goDownSpeed = 0    # the speed for the current block to go down to the ground - in frames
     goDownCounter = 0  # the counter for updating the current block to go down to the ground
     series = 0         # the counter for deleted lines in differ moves
+    level = 1
+    itemEnabled = False
+    nextLevel = 0
+    levelSpeed = 0
 
     # hold "right move key" update variables
     pressingRight = False
@@ -53,7 +57,7 @@ class Tetris:
     pressingLeftFirstUpdate = 0
 
     # set the default values for this game
-    def __init__(self, _width, _height, posX, posY):
+    def __init__(self, _width, _height, posX, posY, _level, _levelSpeed, _itemsEnabled):
         self.height = _height
         self.width = _width
         self.fieldPosX = posX * configs.zoom
@@ -61,7 +65,6 @@ class Tetris:
         self.field = []
         self.score = 0
         self.state = "running"
-        self.goDownSpeed = configs.fps * 2
         self.goDownCounter = 1
         self.series = 0
         self.pressingRight = False
@@ -70,6 +73,12 @@ class Tetris:
         self.pressingLeft = False
         self.pressingLeftCounter = 0
         self.pressingLeftFirstUpdate = 0
+        self.level = _level
+        self.itemEnabled = _itemsEnabled
+        self.nextLevel = configs.levelUp[_level - 1] * _levelSpeed
+        self.levelSpeed = _levelSpeed
+
+        self.updateDropSpeed()
 
         # create the field lines and values
         for i in range(_height):
@@ -169,7 +178,10 @@ class Tetris:
         # update score
         if deletedLines > 0:
             self.series += 1
-            self.score += ((deletedLines + 1) ** 2) * self.series
+            self.score += (deletedLines ** 2) * self.series * self.level
+            if self.score >= self.nextLevel:
+                self.nextLevel += configs.levelUp[self.level] * self.difficulty
+                self.level += 1
         else:
             self.series = 0
 
@@ -232,6 +244,9 @@ class Tetris:
             if self.pressingRightFirstUpdate > configs.updatePressingKey * 5:
                 self.pressingRightCounter = (self.pressingRightCounter + 1) % (configs.updatePressingKey + 1)
 
+    def updateDropSpeed(self):
+        self.goDownSpeed = configs.fps * 2 - int(configs.fps * 0.065 * self.level)
+
     def draw(self, screen):
         # draw game field border
         pygame.draw.rect(screen, color=configs.clWhite, rect=[self.fieldPosX - 1, self.fieldPosY - 1, self.width * configs.zoom + 2, self.height * configs.zoom + 2], width=1)
@@ -239,15 +254,22 @@ class Tetris:
         # draw game field
         for i in range(self.height):
             for j in range(self.width):
-                border = 0
+                border = False
                 clBlock = configs.clWhite
+                clBorder = configs.clWhite
                 if self.field[i][j] == 0 or self.state == "paused":
-                    border = 1
-                    clBlock = configs.clDarkGray
+                    border = True
+                    clBorder = configs.clDarkGray
+                elif self.field[i][j] > len(configs.clBlockColors):
+                    clBlock = configs.clBlockColors[7]
+                    clBorder = configs.clBlockBorderColors[7]
                 elif self.field[i][j] > 0:
                     clBlock = configs.clBlockColors[self.field[i][j] - 1]
+                    clBorder = configs.clBlockBorderColors[self.field[i][j] - 1]
 
-                pygame.draw.rect(screen, color=clBlock, rect=[self.fieldPosX + j * configs.zoom, self.fieldPosY + i * configs.zoom, configs.zoom, configs.zoom], width=border)
+                if not border:
+                    pygame.draw.rect(screen, color=clBlock, rect=[self.fieldPosX + j * configs.zoom, self.fieldPosY + i * configs.zoom, configs.zoom, configs.zoom])
+                pygame.draw.rect(screen, color=clBorder, rect=[self.fieldPosX + j * configs.zoom, self.fieldPosY + i * configs.zoom, configs.zoom, configs.zoom], width=1)
 
         # draw game current block
         if self.block is not None and self.state != "paused":
@@ -255,8 +277,18 @@ class Tetris:
                 for j in range(4):
                     position = i * 4 + j
                     if position in self.block.image():
-                        clBlock = configs.clBlockColors[self.block.type]
+                        clBlock = configs.clWhite
+                        clBorder = configs.clWhite
                         if not configs.multiColorBlock:
                             clBlock = configs.clActiveBlock
+                            clBorder = configs.clActiveBlockBorder
+                        elif self.block.type > len(configs.clBlockColors):
+                            clBlock = configs.clBlockColors[7]
+                            clBorder = configs.clBlockBorderColors[7]
+                        else:
+                            clBlock = configs.clBlockColors[self.block.type]
+                            clBorder = configs.clBlockBorderColors[self.block.type]
+
                         pygame.draw.rect(screen, color=clBlock, rect=[self.fieldPosX + (j + self.block.x) * configs.zoom, self.fieldPosY + (i + self.block.y) * configs.zoom, configs.zoom, configs.zoom])
+                        pygame.draw.rect(screen, color=clBorder, rect=[self.fieldPosX + (j + self.block.x) * configs.zoom, self.fieldPosY + (i + self.block.y) * configs.zoom, configs.zoom, configs.zoom], width=1)
 #===========[ Game-Class - End ]==========================
