@@ -57,7 +57,8 @@ gameLevel = [
 # "singleplayerMenuItemList" = [[vertical menu, menu items ...] menu areas]
 singleplayerMenuItemList = [[
     True,
-    menu.SelectBoxVertical("Level", gameLevel, 1, singleplayerMenuScale, singleplayerMenuValueWidth, True, singleplayerMenuWidth - singleplayerMenuValueWidth)
+    menu.SelectBoxVertical("Level", gameLevel, 1, singleplayerMenuScale, singleplayerMenuValueWidth, True, singleplayerMenuWidth - singleplayerMenuValueWidth),
+    menu.CheckBox("Items", False, 1, singleplayerMenuScale, singleplayerMenuValueWidth, True, singleplayerMenuWidth - singleplayerMenuValueWidth)
 ],
 [
     False,
@@ -66,7 +67,7 @@ singleplayerMenuItemList = [[
 ]]
 
 mainMenu = menu.Menu(int((windowWidth - (menuMenuWidth + 1) * mainMenuScale) / 2), int((windowHeight - 15 * mainMenuScale) / 2), menuMenuWidth + 1, 15, mainMenuScale, mainMenuItemList, screen)
-singleplayerMenu = menu.Menu(int((windowWidth - (singleplayerMenuWidth + 1) * singleplayerMenuScale) / 2), int((windowHeight - 12 * singleplayerMenuScale) / 2), singleplayerMenuWidth + 1, 12, singleplayerMenuScale, singleplayerMenuItemList, screen)
+singleplayerMenu = menu.Menu(int((windowWidth - (singleplayerMenuWidth + 1) * singleplayerMenuScale) / 2), int((windowHeight - 12 * singleplayerMenuScale) / 2), singleplayerMenuWidth + 1, 13, singleplayerMenuScale, singleplayerMenuItemList, screen)
 
 #===========[ Main-Loop - Begin ]=========================
 clock = pygame.time.Clock()

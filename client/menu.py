@@ -90,7 +90,7 @@ class SelectBoxVertical:
         self.value_font = pygame.font.SysFont('DejaVu Sans', self.fontSize, True, False)
 
         (text_width, self.text_height) = self.text_caption.get_size()
-        self.height = self.text_height * 3 + int(spaceBetweenMenuItems * configs.zoom * self.scale) * 2
+        self.height = self.text_height * 3 + int(spaceBetweenMenuItems * configs.zoom * self.scale) * 3
 
     def draw(self, screen, x, y, selected):
         textInMiddle = self.text_height + int(spaceBetweenMenuItems * configs.zoom * self.scale)
@@ -102,19 +102,19 @@ class SelectBoxVertical:
             clText = configs.clMenuTextSelected
             if self.isEdit:
                 pygame.draw.rect(screen, color=configs.clMenuBackgroundSelected, rect=[x + self.maxCaptionWidth, y + self.text_height + int(spaceBetweenMenuItems / 2 * configs.zoom * self.scale), self.maxValueWidth, textInMiddle])
-            pygame.draw.rect(screen, color=configs.clMenuTextSelected, rect=[x + self.maxCaptionWidth, y + self.text_height + int(spaceBetweenMenuItems / 2 * configs.zoom * self.scale), self.maxValueWidth, textInMiddle], width=1)
 
+        pygame.draw.rect(screen, color=clText, rect=[x + self.maxCaptionWidth, y + self.text_height + int(spaceBetweenMenuItems / 2 * configs.zoom * self.scale), self.maxValueWidth, textInMiddle], width=1)
         self.text_caption = self.caption_font.render(self.caption, True, clText)
         screen.blit(self.text_caption, [x, y + textInMiddle])
 
         if self.selectedValue > 0:
             outputText = self.value_font.render(self.values[self.selectedValue - 1][0], True, configs.clMenuTextUnselected)
             (xSize, ySize) = outputText.get_size()
-            screen.blit(outputText, [x + self.maxCaptionWidth + (self.maxValueWidth - xSize) / 2, y])
+            screen.blit(outputText, [x + self.maxCaptionWidth + (self.maxValueWidth - xSize) / 2, y + int(spaceBetweenMenuItems * configs.zoom * self.scale * 0.5)])
         if self.selectedValue < len(self.values) - 1:
             outputText = self.value_font.render(self.values[self.selectedValue + 1][0], True, configs.clMenuTextUnselected)
             (xSize, ySize) = outputText.get_size()
-            screen.blit(outputText, [x + self.maxCaptionWidth + (self.maxValueWidth - xSize) / 2, y + textInMiddle * 2])
+            screen.blit(outputText, [x + self.maxCaptionWidth + (self.maxValueWidth - xSize) / 2, y + textInMiddle + self.text_height + int(spaceBetweenMenuItems * configs.zoom * self.scale * 0.5)])
 
 
         outputText = self.value_font.render(self.values[self.selectedValue][0], True, clText)
@@ -131,6 +131,79 @@ class SelectBoxVertical:
     def getValue(self):
         return self.values[self.selectedValue][1]
 #===========[ Menu-Selectbox vertical - End ]=============
+
+#===========[ Menu-CheckBox horizontal - Begin ]==========
+class CheckBox:
+    fontSize = 0
+    scale = 1
+    maxValueWidth = 0
+    enabled = True
+    caption = ""
+    height = 0
+    maxCaptionWidth = 0
+    defaultValue = False
+    value = False
+    text_height = 0
+    maxWidth = 0
+
+    caption_font = None
+    value_font = None
+    text_caption = None
+
+    def __init__(self, _caption, _defaultValue, _fontSize, _scale, _maxValueWidth, _enabled, _maxCaptionWidth):
+        self.fontSize = int(_fontSize * configs.zoom * _scale)
+        self.scale = _scale
+        self.maxValueWidth = _maxValueWidth * configs.zoom * _scale
+        self.enabled = _enabled
+        self.caption = _caption
+        self.maxCaptionWidth = _maxCaptionWidth * configs.zoom * _scale
+        self.defaultValue = _defaultValue
+        self.value = _defaultValue
+        self.maxWidth = self.maxCaptionWidth + self.maxValueWidth
+
+        self.caption_font = pygame.font.SysFont('DejaVu Sans', self.fontSize, True, False)
+        self.text_caption = self.caption_font.render(self.caption, True, configs.clMenuTextUnselected)
+
+        self.value_font = pygame.font.SysFont('DejaVu Sans', self.fontSize, True, False)
+
+        (text_width, self.text_height) = self.text_caption.get_size()
+        self.height = self.text_height + int(spaceBetweenMenuItems * configs.zoom * self.scale)
+
+    def draw(self, screen, x, y, selected):
+        clText = configs.clMenuTextUnselected
+        if not self.enabled:
+            clText = configs.clMenuTextDisabled
+        elif selected:
+            clText = configs.clMenuTextSelected
+            pygame.draw.rect(screen, color=configs.clMenuBackgroundSelected, rect=[x + self.maxCaptionWidth, y - int(spaceBetweenMenuItems / 2 * configs.zoom * self.scale), self.maxValueWidth, self.height])
+            pygame.draw.rect(screen, color=clText, rect=[x + self.maxCaptionWidth, y - int(spaceBetweenMenuItems / 2 * configs.zoom * self.scale), self.maxValueWidth, self.height], width=1)
+
+        self.text_caption = self.caption_font.render(self.caption, True, clText)
+        screen.blit(self.text_caption, [x, y])
+
+        text = "Off"
+        clValue = configs.clChckeBoxOffUnselected
+        if self.value:
+            text = "On"
+            if selected:
+                clValue = configs.clChckeBoxOnSelected
+            else:
+                clValue = configs.clChckeBoxOnUnselected
+        elif selected:
+            clValue = configs.clChckeBoxOffSelected
+        outputText = self.value_font.render(text, True, clValue)
+        (xSize, ySize) = outputText.get_size()
+        screen.blit(outputText, [x + self.maxCaptionWidth + (self.maxValueWidth - xSize) / 2, y])
+
+    def toggleValue(self):
+        self.value = not self.value
+
+    def reset(self):
+        self.value = self.defaultValue
+
+    def getValue(self):
+        return self.value
+#===========[ Menu-CheckBox horizontal - End ]============
 
 #===========[ Menu-Class - Begin ]========================
 class Menu:
@@ -173,7 +246,11 @@ class Menu:
 
             yOffset = 0
             for area in range(len(self.menuItems)):
-                yOffset += int(0.7 * configs.zoom * self.scale)
+                yOffset += int(spaceBetweenMenuItems * configs.zoom * self.scale)
+                if area > 0:
+                    yOffset += int(spaceBetweenMenuItems * configs.zoom * self.scale / 2)
+                    pygame.draw.line(self.screen, color=configs.clMenuBorder, start_pos=[int(self.x * configs.zoom), int(self.y * self.scale * configs.zoom + yOffset)], end_pos=[int((self.x + self.width * self.scale) * configs.zoom), int(self.y * configs.zoom + yOffset)], width=1)
+                    yOffset += int(spaceBetweenMenuItems * configs.zoom * self.scale)
                 xOffset = 0
                 verticalMenu = self.menuItems[area][0]
                 for item in range(len(self.menuItems[area])):
@@ -186,6 +263,7 @@ class Menu:
                             yOffset += self.menuItems[area][item].height
                         else:
                             xOffset += self.menuItems[area][item].maxWidth
+
 
     def updateInput(self, event):
         # update key-events
@@ -216,7 +294,9 @@ class Menu:
                     elif event.key == pygame.K_RETURN and isinstance(self.menuItems[self.selectedArea][self.selectedItem], Button):
                         usedButton = self.menuItems[self.selectedArea][self.selectedItem].buttonID
                     elif event.key == pygame.K_RETURN and isinstance(self.menuItems[self.selectedArea][self.selectedItem], SelectBoxVertical):
-                            self.menuItems[self.selectedArea][self.selectedItem].isEdit = True
+                        self.menuItems[self.selectedArea][self.selectedItem].isEdit = True
+                    elif event.key == pygame.K_RETURN and isinstance(self.menuItems[self.selectedArea][self.selectedItem], CheckBox):
+                        self.menuItems[self.selectedArea][self.selectedItem].toggleValue()
         return usedButton
 
     def reset(self):

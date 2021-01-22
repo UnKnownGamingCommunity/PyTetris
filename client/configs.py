@@ -2,6 +2,7 @@
 fps = 60                     # set the framerate of the game
 zoom = 20                    # set the size of the output
 multiColorBlock = True       # enable multiple colors (blocks - also known as tetriminos - only)
+multiColorMenu = True        # enable multiple menu colors
 updatePressingKey = fps / 20 # update the pressed keys per second
 #===========[ Game-Setting - End ]========================
 
@@ -16,6 +17,7 @@ clMenuTextSelected = (255, 255, 255)
 clMenuTextUnselected = (200, 200, 200)
 clMenuTextDisabled = (128, 128, 128)
 clMenuBackgroundSelected = (60, 60, 60)
+
 if multiColorBlock:
     clBlockColors = [
         (0, 240, 240),  # I-Block
@@ -39,6 +41,17 @@ else:
         (200, 200, 200), # S-Block
         (200, 200, 200)  # unknown Block
     ]
+
+if multiColorMenu:
+    clChckeBoxOnSelected = (200, 0, 0)
+    clChckeBoxOffSelected = (0, 200, 0)
+    clChckeBoxOnUnselected = (130, 0, 0)
+    clChckeBoxOffUnselected = (0, 130, 0)
+else:
+    clChckeBoxOnSelected = (255, 255, 255)
+    clChckeBoxOffSelected = (255, 255, 255)
+    clChckeBoxOnUnselected = (200, 200, 200)
+    clChckeBoxOffUnselected = (200, 200, 200)
 #===========[ Colors - End ]==============================
 
 #===========[ Block-List - Begin ]========================
