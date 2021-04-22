@@ -36,7 +36,7 @@ class SinglePlayer:
     def __init__(self, _screen, _level, _levelSpeed, _itemsEnabled, _windowWidth, _windowHeight):
         filedWidth = 10
         filedHeight = 20
-        self.gameList = [game.Tetris(filedWidth, filedHeight, _windowWidth - gameFiledBorderDistanceX - filedWidth, gameFiledBorderDistanceY, _level, _levelSpeed, _itemsEnabled)]
+        self.gameList = [game.Tetris(filedWidth, filedHeight, _windowWidth - gameFiledBorderDistanceX - filedWidth, gameFiledBorderDistanceY, _level, _levelSpeed, _itemsEnabled, True)]
         self.gameInput = self.gameList[0]  # the local game
         self.screen = _screen
         self.level = _level
@@ -124,7 +124,7 @@ class SinglePlayer:
             for i in range(4):
                 if 12 - i * 4 in _block.image() or 13 - i * 4 in _block.image() or 14 - i * 4 in _block.image() or 15 - i * 4 in _block.image():
                     blockHeight += 1
-            functions.DrawSingleBlock(self.screen, xFontOffset + int((xRacWidth - blockWidth * configs.zoom) / 2), yFontOffset + int(blockHeight / 2 * configs.zoom), _block)
+            functions.drawSingleBlock(self.screen, xFontOffset + int((xRacWidth - blockWidth * configs.zoom) / 2), yFontOffset + int(blockHeight / 2 * configs.zoom), _block)
 
             # draw score box
             (xSize, ySize) = self.text_level.get_size()

@@ -4,6 +4,8 @@ zoom = 30                    # set the size of the output
 multiColorBlock = True       # enable multiple colors (blocks - also known as tetriminos - only)
 multiColorMenu = True        # enable multiple menu colors
 updatePressingKey = fps / 20 # update the pressed keys per second
+maxItemStack = 10            # count of stored items
+itemsOnFiled = 0.05             # percent of items on the filed
 #===========[ Game-Setting - End ]========================
 
 #===========[ Colors - Begin ]============================
@@ -129,3 +131,21 @@ levelUp = [
     23500  # to level 30
 ]
 #===========[ Level Increase - End ]======================
+
+#===========[ Items - Begin ]=============================
+# list of singleplayer item IDs
+itemIDsSingleplayer = [
+    1001, # nuke
+    1002, # left shift
+    1003, # down shift
+    1004  # delete line
+]
+
+# list of multiplayer item IDs
+itemIDsMultiPlayer = [
+    2001, # random blocks
+    2002, # swap field
+    2003  # add line
+    # ToDo: add item ids of the single player items
+]
+#===========[ Items - End ]===============================

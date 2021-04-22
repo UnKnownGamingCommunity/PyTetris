@@ -2,6 +2,7 @@ import pygame
 import configs
 import block
 import functions
+import random
 
 #===========[ Game-Class - Begin ]========================
 class Tetris:
@@ -21,6 +22,8 @@ class Tetris:
     itemEnabled = False
     nextLevel = 0
     levelSpeed = 0
+    itemList = []
+    isSingleplayer = False
 
     # hold "right move key" update variables
     pressingRight = False
@@ -32,7 +35,7 @@ class Tetris:
     pressingLeftFirstUpdate = 0
 
     # set the default values for this game
-    def __init__(self, _width, _height, posX, posY, _level, _levelSpeed, _itemsEnabled):
+    def __init__(self, _width, _height, posX, posY, _level, _levelSpeed, _itemsEnabled, _isSingleplayer):
         self.height = _height
         self.width = _width
         self.fieldPosX = posX * configs.zoom
@@ -54,6 +57,7 @@ class Tetris:
         self.levelSpeed = _levelSpeed
         self.block = block.Block(3, 0)
         self.nextBlock = block.Block(3, 0)
+        self.isSingleplayer = _isSingleplayer
 
         self.updateDropSpeed()
 
@@ -136,10 +140,13 @@ class Tetris:
             # mark complete kines
             line = self.field[i]
             lineIsFull = True
+            itemList = []
             for j in range(self.width):
                 if line[j] == 0:
                     lineIsFull = False
                     break
+                elif line[j] > 1000:
+                    itemList.append(line[j])
 
             # remove line
             if lineIsFull:
@@ -153,6 +160,10 @@ class Tetris:
                 new_line.append(0)
             self.field.insert(0, new_line)
 
+        # spawn items
+        if deletedLines > 0:
+            self.generateItems()
+
         # update score
         if deletedLines > 0:
             self.series += 1
@@ -162,6 +173,33 @@ class Tetris:
                 self.level += 1
         else:
             self.series = 0
+
+    def generateItems(self):
+        count = 0
+        itemCount = 0
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.field[y][x] > 0:
+                    count += 1
+                    if (self.field[y][x] > 1000):
+                        itemCount += 1
+
+        if count > 0:
+            while itemCount / count < configs.itemsOnFiled:
+                randX = random.randint(0, self.width - 1)
+                randY = random.randint(0, self.height - 1)
+                if self.field[randY][randX] > 0 and self.field[randY][randX] <= 1000:
+                    if self.isSingleplayer:
+                        self.field[randY][randX] = configs.itemIDsSingleplayer[random.randint(0, len(configs.itemIDsSingleplayer) - 1)]
+                    else:
+                        self.field[randY][randX] = configs.itemIDsMultiPlayer[random.randint(0, len(configs.itemIDsMultiPlayer) - 1)]
+                    itemCount += 1
+
+    def updateItemList(self, _itemList):
+        for i in range(len(_itemList)):
+            if len(self.itemList) <= configs.maxItemStack:
+                self.itemList.append(_itemList[i])
+        pass
 
     # check the new position of the current block for intersection
     def checkInterscetion(self):
@@ -251,5 +289,5 @@ class Tetris:
 
         # draw game current block
         if self.block is not None and self.state != "paused":
-            functions.DrawSingleBlock(screen, self.fieldPosX + self.block.x * configs.zoom, self.fieldPosY + self.block.y * configs.zoom, self.block)
+            functions.drawSingleBlock(screen, self.fieldPosX + self.block.x * configs.zoom, self.fieldPosY + self.block.y * configs.zoom, self.block)
 #===========[ Game-Class - End ]==========================
