@@ -1,6 +1,6 @@
 #===========[ Game-Setting - Begin ]======================
 fps = 60                     # set the framerate of the game
-zoom = 20                    # set the size of the output
+zoom = 30                    # set the size of the output
 multiColorBlock = True       # enable multiple colors (blocks - also known as tetriminos - only)
 multiColorMenu = True        # enable multiple menu colors
 updatePressingKey = fps / 20 # update the pressed keys per second

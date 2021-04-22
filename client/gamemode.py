@@ -103,7 +103,7 @@ class SinglePlayer:
             xRacPos = int(gameFiledBorderDistanceX * configs.zoom)
             yRacPos = int(gameFiledBorderDistanceY * configs.zoom) - 1
             xRacWidth = int(6 * configs.zoom)
-            yRacHeight = int(3.2 * configs.zoom) + ySize
+            yRacHeight = int(5.2 * configs.zoom) + ySize
             pygame.draw.rect(self.screen, color=configs.clBlack, rect=[xRacPos, yRacPos, xRacWidth, yRacHeight])
             pygame.draw.rect(self.screen, color=configs.clWhite, rect=[xRacPos, yRacPos, xRacWidth, yRacHeight], width=1)
 
@@ -113,15 +113,18 @@ class SinglePlayer:
             self.screen.blit(self.text_next, [xFontOffset + int((xRacWidth - xSize) / 2), yFontOffset])
             yFontOffset += ySize + 0.5 * configs.zoom
             # update next block
+            # get block width
             _block = self.gameList[0].nextBlock
-            blockSize = 0
-            if 3 in _block.image() or 7 in _block.image() or 11 in _block.image() or 16 in _block.image():
-                blockSize = 4
-            elif 2 in _block.image() or 6 in _block.image() or 10 in _block.image() or 15 in _block.image():
-                blockSize = 3
-            else:
-                blockSize = 2
-            functions.DrawSingleBlock(self.screen, xFontOffset + int((xRacWidth - blockSize * configs.zoom) / 2), yFontOffset, _block)
+            blockWidth = 0
+            for i in range(4):
+                if 3 - i in _block.image() or 7 - i in _block.image() or 11 - i in _block.image() or 15 - i in _block.image():
+                    blockWidth += 1
+            # get block height
+            blockHeight = 0
+            for i in range(4):
+                if 12 - i * 4 in _block.image() or 13 - i * 4 in _block.image() or 14 - i * 4 in _block.image() or 15 - i * 4 in _block.image():
+                    blockHeight += 1
+            functions.DrawSingleBlock(self.screen, xFontOffset + int((xRacWidth - blockWidth * configs.zoom) / 2), yFontOffset + int(blockHeight / 2 * configs.zoom), _block)
 
             # draw score box
             (xSize, ySize) = self.text_level.get_size()
