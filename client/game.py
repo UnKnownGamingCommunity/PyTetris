@@ -1,33 +1,7 @@
 import pygame
-import random
 import configs
-
-#===========[ Block-Class - Begin ]=======================
-class Block:
-    x = 0        # position in the game field
-    y = 0        # position in the game field
-    rotation = 0 # rotation index of "allBlocks"
-    type = 0     # type index of "allBlocks"
-
-    # set the default values for this block
-    def __init__(self, x_coord, y_coord):
-        self.x = x_coord
-        self.y = y_coord
-        self.rotation = 0
-        self.type = random.randint(0, len(configs.allBlocks) - 1)
-
-    # get the shape of the block
-    def image(self):
-        return configs.allBlocks[self.type][self.rotation]
-
-    # rotate the block clockwise
-    def rotateRight(self):
-        self.rotation = (self.rotation + 1) % len(configs.allBlocks[self.type])
-
-    # rotate the block counter-clockwise
-    def rotateLeft(self):
-        self.rotation = (self.rotation - 1) % len(configs.allBlocks[self.type])
-#===========[ Block-Class - End ]=========================
+import block
+import functions
 
 #===========[ Game-Class - Begin ]========================
 class Tetris:
@@ -39,6 +13,7 @@ class Tetris:
     fieldPosX = 0      # position of the field in the window - only used on draw
     fieldPosY = 0      # position of the field in the window - only used on draw
     block = None       # the current block
+    nextBlock = None   # the next block
     goDownSpeed = 0    # the speed for the current block to go down to the ground - in frames
     goDownCounter = 0  # the counter for updating the current block to go down to the ground
     series = 0         # the counter for deleted lines in differ moves
@@ -77,6 +52,8 @@ class Tetris:
         self.itemEnabled = _itemsEnabled
         self.nextLevel = configs.levelUp[_level - 1] * _levelSpeed
         self.levelSpeed = _levelSpeed
+        self.block = block.Block(3, 0)
+        self.nextBlock = block.Block(3, 0)
 
         self.updateDropSpeed()
 
@@ -88,7 +65,8 @@ class Tetris:
             self.field.append(new_line)
 
     def newBlock(self):
-        self.block = Block(3, 0)
+        self.block = self.nextBlock
+        self.nextBlock = block.Block(3, 0)
         if self.checkInterscetion():
             self.state = "gameover"
             self.block = None
@@ -180,7 +158,7 @@ class Tetris:
             self.series += 1
             self.score += (deletedLines ** 2) * self.series * self.level
             if self.score >= self.nextLevel:
-                self.nextLevel += configs.levelUp[self.level] * self.difficulty
+                self.nextLevel += configs.levelUp[self.level] * self.levelSpeed
                 self.level += 1
         else:
             self.series = 0
@@ -273,22 +251,5 @@ class Tetris:
 
         # draw game current block
         if self.block is not None and self.state != "paused":
-            for i in range(4):
-                for j in range(4):
-                    position = i * 4 + j
-                    if position in self.block.image():
-                        clBlock = configs.clWhite
-                        clBorder = configs.clWhite
-                        if not configs.multiColorBlock:
-                            clBlock = configs.clActiveBlock
-                            clBorder = configs.clActiveBlockBorder
-                        elif self.block.type > len(configs.clBlockColors):
-                            clBlock = configs.clBlockColors[7]
-                            clBorder = configs.clBlockBorderColors[7]
-                        else:
-                            clBlock = configs.clBlockColors[self.block.type]
-                            clBorder = configs.clBlockBorderColors[self.block.type]
-
-                        pygame.draw.rect(screen, color=clBlock, rect=[self.fieldPosX + (j + self.block.x) * configs.zoom, self.fieldPosY + (i + self.block.y) * configs.zoom, configs.zoom, configs.zoom])
-                        pygame.draw.rect(screen, color=clBorder, rect=[self.fieldPosX + (j + self.block.x) * configs.zoom, self.fieldPosY + (i + self.block.y) * configs.zoom, configs.zoom, configs.zoom], width=1)
+            functions.DrawSingleBlock(screen, self.fieldPosX + self.block.x * configs.zoom, self.fieldPosY + self.block.y * configs.zoom, self.block)
 #===========[ Game-Class - End ]==========================

@@ -2,11 +2,13 @@ import configs
 import game
 import pygame
 import menu
+import functions
 
 
 gameMenuScale = 1
 gameMenuWidth = 8
-gameFiledBorderDistance = 1
+gameFiledBorderDistanceX = 1.5
+gameFiledBorderDistanceY = 1
 
 # "gameMenuItemList" = [[vertical menu, menu items ...] menu areas]
 gameMenuItemList = [[
@@ -27,15 +29,15 @@ class SinglePlayer:
     text_gameover = None
     value_font = None
     header_font = None
+    text_next = None
     text_score = None
     text_level = None
 
     def __init__(self, _screen, _level, _levelSpeed, _itemsEnabled, _windowWidth, _windowHeight):
         filedWidth = 10
         filedHeight = 20
-        self.gameList = [game.Tetris(filedWidth, filedHeight, _windowWidth - gameFiledBorderDistance - filedWidth, gameFiledBorderDistance, _level, _levelSpeed, _itemsEnabled)]
+        self.gameList = [game.Tetris(filedWidth, filedHeight, _windowWidth - gameFiledBorderDistanceX - filedWidth, gameFiledBorderDistanceY, _level, _levelSpeed, _itemsEnabled)]
         self.gameInput = self.gameList[0]  # the local game
-        self.gameList[0].newBlock()
         self.screen = _screen
         self.level = _level
         self.itemsEnabled = _itemsEnabled
@@ -47,8 +49,9 @@ class SinglePlayer:
         self.value_font = pygame.font.SysFont('DejaVu Sans', int(0.8 * configs.zoom), True, False)
 
         self.header_font = pygame.font.SysFont('DejaVu Sans', int(1.1 * configs.zoom), True, False)
-        self.text_level = self.header_font.render("Level", True, configs.clWhite)
+        self.text_next = self.header_font.render("Next", True, configs.clWhite)
         self.text_score = self.header_font.render("Score", True, configs.clWhite)
+        self.text_level = self.header_font.render("Level", True, configs.clWhite)
 
     def run(self, clock, windowWidth, windowHeight):
         gameMenu = menu.Menu((windowWidth - (gameMenuWidth + 1) * gameMenuScale) / 2, (windowHeight - 7.3 * gameMenuScale) / 2, (gameMenuWidth + 1) * gameMenuScale, 7.3 * gameMenuScale, gameMenuScale, gameMenuItemList, self.screen)
@@ -94,35 +97,41 @@ class SinglePlayer:
 
             #=======[ Draw Game - Begin ]=========================
             self.screen.fill(color=configs.clBlack)  # "clear" the screen
-            # draw every field
-            for game in self.gameList:
-                # update current block - go to the ground
-                if game.state == "running":
-                    game.goDown()
 
-                game.draw(self.screen)
+            # draw next block box
+            (xSize, ySize) = self.text_score.get_size()
+            xRacPos = int(gameFiledBorderDistanceX * configs.zoom)
+            yRacPos = int(gameFiledBorderDistanceY * configs.zoom) - 1
+            xRacWidth = int(6 * configs.zoom)
+            yRacHeight = int(3.2 * configs.zoom) + ySize
+            pygame.draw.rect(self.screen, color=configs.clBlack, rect=[xRacPos, yRacPos, xRacWidth, yRacHeight])
+            pygame.draw.rect(self.screen, color=configs.clWhite, rect=[xRacPos, yRacPos, xRacWidth, yRacHeight], width=1)
 
-                # draw game over screen
-                if game.state == "gameover":
-                    (xSize, ySize) = self.text_gameover.get_size()
-                    xOffset = int((windowWidth * configs.zoom - xSize - configs.zoom * 0.5) / 2)
-                    yOffset = int((windowHeight * configs.zoom - ySize - configs.zoom * 0.5) / 2)
-                    pygame.draw.rect(self.screen, color=configs.clBlack, rect=[xOffset, int(9.175 * configs.zoom), int(17 * configs.zoom), int(3.25 * configs.zoom)])
-                    pygame.draw.rect(self.screen, color=configs.clWhite, rect=[xOffset, int(9.175 * configs.zoom), int(17 * configs.zoom), int(3.25 * configs.zoom)], width=1)
-                    self.screen.blit(self.text_gameover, [int((windowWidth * configs.zoom - xSize) / 2), int((windowHeight * configs.zoom - ySize) / 2)])
+            # draw next block header
+            xFontOffset = xRacPos
+            yFontOffset = yRacPos + int(0.25 * configs.zoom)
+            self.screen.blit(self.text_next, [xFontOffset + int((xRacWidth - xSize) / 2), yFontOffset])
+            yFontOffset += ySize + 0.5 * configs.zoom
+            # update next block
+            _block = self.gameList[0].nextBlock
+            blockSize = 0
+            if 3 in _block.image() or 7 in _block.image() or 11 in _block.image() or 16 in _block.image():
+                blockSize = 4
+            elif 2 in _block.image() or 6 in _block.image() or 10 in _block.image() or 15 in _block.image():
+                blockSize = 3
+            else:
+                blockSize = 2
+            functions.DrawSingleBlock(self.screen, xFontOffset + int((xRacWidth - blockSize * configs.zoom) / 2), yFontOffset, _block)
 
             # draw score box
-            (xSize, ySize) = self.text_score.get_size()
-            xRacPos = int(gameFiledBorderDistance * configs.zoom)
-            yRacPos = int(gameFiledBorderDistance * configs.zoom) - 1
-            xRacWidth = int(6 * configs.zoom) + xRacPos
+            (xSize, ySize) = self.text_level.get_size()
+            yRacPos += int(0.5 * configs.zoom) + yRacHeight
             yRacHeight = int(1 * configs.zoom) + ySize + self.value_font.get_height()
             pygame.draw.rect(self.screen, color=configs.clBlack, rect=[xRacPos, yRacPos, xRacWidth, yRacHeight])
             pygame.draw.rect(self.screen, color=configs.clWhite, rect=[xRacPos, yRacPos, xRacWidth, yRacHeight], width=1)
 
             # draw score header
-            xFontOffset = xRacPos
-            yFontOffset = yRacPos + int(0.25 * configs.zoom)
+            yFontOffset = yRacPos + 0.25 * configs.zoom
             self.screen.blit(self.text_score, [xFontOffset + int((xRacWidth - xSize) / 2), yFontOffset])
             yFontOffset += ySize
             # update score
@@ -146,6 +155,23 @@ class SinglePlayer:
             (xSize, ySize) = levelUpdateText.get_size()
             yFontOffset += 0.5 * configs.zoom
             self.screen.blit(levelUpdateText, [xFontOffset + int((xRacWidth - xSize) / 2), yFontOffset])
+
+            # draw every field
+            for game in self.gameList:
+                # update current block - go to the ground
+                if game.state == "running":
+                    game.goDown()
+
+                game.draw(self.screen)
+
+                # draw game over screen
+                if game.state == "gameover":
+                    (xSize, ySize) = self.text_gameover.get_size()
+                    xOffset = int((windowWidth * configs.zoom - xSize - configs.zoom * 0.5) / 2)
+                    yOffset = int((windowHeight * configs.zoom - ySize - configs.zoom * 0.5) / 2)
+                    pygame.draw.rect(self.screen, color=configs.clBlack, rect=[xOffset, int(9.175 * configs.zoom), int(17 * configs.zoom), int(3.25 * configs.zoom)])
+                    pygame.draw.rect(self.screen, color=configs.clWhite, rect=[xOffset, int(9.175 * configs.zoom), int(17 * configs.zoom), int(3.25 * configs.zoom)], width=1)
+                    self.screen.blit(self.text_gameover, [int((windowWidth * configs.zoom - xSize) / 2), int((windowHeight * configs.zoom - ySize) / 2)])
 
             gameMenu.drawMenu()
             pygame.display.flip()  # update screen
